@@ -3,7 +3,7 @@ import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from '
 
 import libgen from './libgen';
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  const lbgen = new BOOKS.Libgen();
+  const lbgen = new (BOOKS as any).Libgen();
 
   fastify.get('/', async (request: any, reply: any) => {
     reply.status(200).send('Welcome to Consumet Books 📚');
