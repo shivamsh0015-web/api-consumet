@@ -3,7 +3,16 @@ import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from '
 import { LIGHT_NOVELS } from '@consumet/extensions';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  const readlightnovels = new LIGHT_NOVELS.ReadLightNovels();
+  const readlightnovels = (LIGHT_NOVELS as any).ReadLightNovels ? new (LIGHT_NOVELS as any).ReadLightNovels() : null;
+
+  fastify.addHook('preHandler', async (request, reply) => {
+    if (!readlightnovels && request.url !== '/') {
+      return reply.status(503).send({
+        message: 'ReadLightNovels provider is not available in this version of the extensions library.',
+        error: 'service_unavailable',
+      });
+    }
+  });
 
   fastify.get('/', (_, rp) => {
     rp.status(200).send({

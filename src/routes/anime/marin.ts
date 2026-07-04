@@ -3,7 +3,16 @@ import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from '
 import { ANIME } from '@consumet/extensions';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  const marin = new ANIME.Marin();
+  const marin = (ANIME as any).Marin ? new (ANIME as any).Marin() : null;
+
+  fastify.addHook('preHandler', async (request, reply) => {
+    if (!marin && request.url !== '/') {
+      return reply.status(503).send({
+        message: 'Marin provider is not available in this version of the extensions library.',
+        error: 'service_unavailable',
+      });
+    }
+  });
 
   fastify.get('/', (_, rp) => {
     rp.status(200).send({

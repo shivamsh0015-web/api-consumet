@@ -3,7 +3,16 @@ import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from '
 import { ANIME } from '@consumet/extensions';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  const animefox = new ANIME.AnimeFox();
+  const animefox = (ANIME as any).AnimeFox ? new (ANIME as any).AnimeFox() : null;
+
+  fastify.addHook('preHandler', async (request, reply) => {
+    if (!animefox && request.url !== '/') {
+      return reply.status(503).send({
+        message: 'AnimeFox provider is not available in this version of the extensions library.',
+        error: 'service_unavailable',
+      });
+    }
+  });
 
   fastify.get('/', (_, rp) => {
     rp.status(200).send({

@@ -4,7 +4,16 @@ import { MOVIES } from '@consumet/extensions';
 import { StreamingServers } from '@consumet/extensions/dist/models';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  const viewAsian = new MOVIES.ViewAsian();
+  const viewAsian = (MOVIES as any).ViewAsian ? new (MOVIES as any).ViewAsian() : null;
+
+  fastify.addHook('preHandler', async (request, reply) => {
+    if (!viewAsian && request.url !== '/') {
+      return reply.status(503).send({
+        message: 'ViewAsian provider is not available in this version of the extensions library.',
+        error: 'service_unavailable',
+      });
+    }
+  });
 
   fastify.get('/', (_, rp) => {
     rp.status(200).send({

@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { Redis } from 'ioredis';
+import { Redis } from 'ioredis';
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from 'fastify';
 import { ANIME, META, PROVIDERS_LIST } from '@consumet/extensions';
 import { Genres, SubOrSub } from '@consumet/extensions/dist/models';
@@ -8,8 +9,7 @@ import { StreamingServers } from '@consumet/extensions/dist/models';
 
 import cache from '../../utils/cache';
 import { redis } from '../../main';
-import NineAnime from '@consumet/extensions/dist/providers/anime/9anime';
-import Zoro from '@consumet/extensions/dist/providers/anime/zoro';
+import Hianime from '@consumet/extensions/dist/providers/anime/hianime';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get('/', (_, rp) => {
@@ -173,7 +173,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get(
     '/recent-episodes',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const provider = (request.query as { provider: 'zoro' }).provider;
+      const provider = (request.query as { provider: 'hianime' }).provider;
       const page = (request.query as { page: number }).page;
       const perPage = (request.query as { perPage: number }).perPage;
 
@@ -333,7 +333,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
                 redis,
                 `anilist:watch;${episodeId};${anilist.provider.name.toLowerCase()};${server};${isDub ? 'dub' : 'sub'}`,
                 async () =>
-                  provider === 'zoro' || provider === 'animekai'
+                  provider === 'hianime' || provider === 'animekai'
                     ? await anilist.fetchEpisodeSources(
                       episodeId,
                       server,
@@ -346,7 +346,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
           : reply
             .status(200)
             .send(
-              provider === 'zoro' || provider === 'animekai'
+              provider === 'hianime' || provider === 'animekai'
                 ? await anilist.fetchEpisodeSources(
                   episodeId,
                   server,
@@ -392,27 +392,22 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
 };
 
 const generateAnilistMeta = (provider: string | undefined = undefined): Anilist => {
-  if (typeof provider !== 'undefined') {
-    let possibleProvider = PROVIDERS_LIST.ANIME.find(
-      (p) => p.name.toLowerCase() === provider.toLocaleLowerCase(),
-    );
+  let providerName = provider;
+  if (providerName && providerName.toLowerCase() === 'zoro') {
+    providerName = 'hianime';
+  }
 
-    if (possibleProvider instanceof NineAnime) {
-      possibleProvider = new ANIME.NineAnime(
-        process.env?.NINE_ANIME_HELPER_URL,
-        {
-          url: process.env?.NINE_ANIME_PROXY as string,
-        },
-        process.env?.NINE_ANIME_HELPER_KEY as string,
-      );
-    }
+  if (typeof providerName !== 'undefined') {
+    let possibleProvider = PROVIDERS_LIST.ANIME.find(
+      (p) => p.name.toLowerCase() === providerName.toLocaleLowerCase(),
+    );
 
     return new META.Anilist(possibleProvider, {
       url: process.env.PROXY as string | string[],
     });
   } else {
-    // default provider is Zoro
-    return new Anilist(new Zoro(), {
+    // default provider is Hianime
+    return new Anilist(new Hianime(), {
       url: process.env.PROXY as string | string[],
     });
   }

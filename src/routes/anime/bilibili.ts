@@ -4,7 +4,16 @@ import { ANIME } from '@consumet/extensions';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   if (!process.env.BILIBILI_COOKIE) return;
-  const bilibili = new ANIME.Bilibili(process.env.BILIBILI_COOKIE);
+  const bilibili = (ANIME as any).Bilibili ? new (ANIME as any).Bilibili(process.env.BILIBILI_COOKIE) : null;
+
+  fastify.addHook('preHandler', async (request, reply) => {
+    if (!bilibili && request.url !== '/') {
+      return reply.status(503).send({
+        message: 'Bilibili provider is not available in this version of the extensions library.',
+        error: 'service_unavailable',
+      });
+    }
+  });
 
   fastify.get('/', (_, rp) => {
     rp.status(200).send({

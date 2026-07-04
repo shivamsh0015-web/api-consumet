@@ -4,15 +4,15 @@ import { ANIME } from '@consumet/extensions';
 import { StreamingServers, SubOrSub } from '@consumet/extensions/dist/models';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  const zoro = new ANIME.Zoro(process.env.ZORO_URL);
+  const hianime = new ANIME.Hianime(process.env.HIANIME_URL || process.env.ZORO_URL);
   let baseUrl = 'https://hianime.to';
-  if (process.env.ZORO_URL) {
-    baseUrl = `https://${process.env.ZORO_URL}`;
+  if (process.env.HIANIME_URL || process.env.ZORO_URL) {
+    baseUrl = `https://${process.env.HIANIME_URL || process.env.ZORO_URL}`;
   }
 
   fastify.get('/', (_, rp) => {
     rp.status(200).send({
-      intro: `Welcome to the zoro provider: check out the provider's website @ ${baseUrl}`,
+      intro: `Welcome to the hianime provider: check out the provider's website @ ${baseUrl}`,
       routes: [
         '/:query',
         '/recent-episodes',
@@ -31,7 +31,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
         '/specials',
         '/tv',
       ],
-      documentation: 'https://docs.consumet.org/#tag/zoro',
+      documentation: 'https://docs.consumet.org/#tag/hianime',
     });
   });
 
@@ -40,7 +40,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
 
     const page = (request.query as { page: number }).page;
 
-    const res = await zoro.search(query, page);
+    const res = await hianime.search(query, page);
 
     reply.status(200).send(res);
   });
@@ -50,7 +50,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const page = (request.query as { page: number }).page;
 
-      const res = await zoro.fetchRecentlyUpdated(page);
+      const res = await hianime.fetchRecentlyUpdated(page);
 
       reply.status(200).send(res);
     },
@@ -59,7 +59,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get('/top-airing', async (request: FastifyRequest, reply: FastifyReply) => {
     const page = (request.query as { page: number }).page;
 
-    const res = await zoro.fetchTopAiring(page);
+    const res = await hianime.fetchTopAiring(page);
 
     reply.status(200).send(res);
   });
@@ -67,7 +67,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get('/most-popular', async (request: FastifyRequest, reply: FastifyReply) => {
     const page = (request.query as { page: number }).page;
 
-    const res = await zoro.fetchMostPopular(page);
+    const res = await hianime.fetchMostPopular(page);
 
     reply.status(200).send(res);
   });
@@ -75,7 +75,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get('/most-favorite', async (request: FastifyRequest, reply: FastifyReply) => {
     const page = (request.query as { page: number }).page;
 
-    const res = await zoro.fetchMostFavorite(page);
+    const res = await hianime.fetchMostFavorite(page);
 
     reply.status(200).send(res);
   });
@@ -85,7 +85,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const page = (request.query as { page: number }).page;
 
-      const res = await zoro.fetchLatestCompleted(page);
+      const res = await hianime.fetchLatestCompleted(page);
 
       reply.status(200).send(res);
     },
@@ -94,7 +94,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get('/recent-added', async (request: FastifyRequest, reply: FastifyReply) => {
     const page = (request.query as { page: number }).page;
 
-    const res = await zoro.fetchRecentlyAdded(page);
+    const res = await hianime.fetchRecentlyAdded(page);
 
     reply.status(200).send(res);
   });
@@ -102,7 +102,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get('/top-upcoming', async (request: FastifyRequest, reply: FastifyReply) => {
     const page = (request.query as { page: number }).page;
 
-    const res = await zoro.fetchTopUpcoming(page);
+    const res = await hianime.fetchTopUpcoming(page);
 
     reply.status(200).send(res);
   });
@@ -110,7 +110,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get('/schedule/:date', async (request: FastifyRequest, reply: FastifyReply) => {
     const date = (request.params as { date: string }).date;
 
-    const res = await zoro.fetchSchedule(date);
+    const res = await hianime.fetchSchedule(date);
 
     reply.status(200).send(res);
   });
@@ -121,14 +121,14 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
       const studioId = (request.params as { studioId: string }).studioId;
       const page = (request.query as { page: number }).page ?? 1;
 
-      const res = await zoro.fetchStudio(studioId, page);
+      const res = await hianime.fetchStudio(studioId, page);
 
       reply.status(200).send(res);
     },
   );
 
   fastify.get('/spotlight', async (request: FastifyRequest, reply: FastifyReply) => {
-    const res = await zoro.fetchSpotlight();
+    const res = await hianime.fetchSpotlight();
 
     reply.status(200).send(res);
   });
@@ -138,7 +138,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const query = (request.params as { query: string }).query;
 
-      const res = await zoro.fetchSearchSuggestions(query);
+      const res = await hianime.fetchSearchSuggestions(query);
 
       reply.status(200).send(res);
     },
@@ -151,7 +151,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
       return reply.status(400).send({ message: 'id is required' });
 
     try {
-      const res = await zoro
+      const res = await hianime
         .fetchAnimeInfo(id)
         .catch((err) => reply.status(404).send({ message: err }));
 
@@ -162,6 +162,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
         .send({ message: 'Something went wrong. Contact developer for help.' });
     }
   });
+
   const watch = async (request: FastifyRequest, reply: FastifyReply) => {
     let episodeId = (request.params as { episodeId: string }).episodeId;
     if (!episodeId) {
@@ -180,7 +181,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
       return reply.status(400).send({ message: 'id is required' });
 
     try {
-      const res = await zoro
+      const res = await hianime
         .fetchEpisodeSources(
           episodeId,
           server,
@@ -200,7 +201,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
 
   fastify.get('/genre/list', async (_, reply) => {
     try {
-      const res = await zoro.fetchGenres();
+      const res = await hianime.fetchGenres();
       reply.status(200).send(res);
     } catch (error) {
       reply.status(500).send({
@@ -217,7 +218,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
       return reply.status(400).send({ message: 'genre is required' });
 
     try {
-      const res = await zoro.genreSearch(genre, page);
+      const res = await hianime.genreSearch(genre, page);
       reply.status(200).send(res);
     } catch (error) {
       reply.status(500).send({
@@ -229,7 +230,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get('/movies', async (request: FastifyRequest, reply: FastifyReply) => {
     const page = (request.query as { page: number }).page;
     try {
-      const res = await zoro.fetchMovie(page);
+      const res = await hianime.fetchMovie(page);
       reply.status(200).send(res);
     } catch (err) {
       reply
@@ -241,7 +242,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get('/ona', async (request: FastifyRequest, reply: FastifyReply) => {
     const page = (request.query as { page: number }).page;
     try {
-      const res = await zoro.fetchONA(page);
+      const res = await hianime.fetchONA(page);
       reply.status(200).send(res);
     } catch (err) {
       reply
@@ -253,7 +254,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get('/ova', async (request: FastifyRequest, reply: FastifyReply) => {
     const page = (request.query as { page: number }).page;
     try {
-      const res = await zoro.fetchOVA(page);
+      const res = await hianime.fetchOVA(page);
       reply.status(200).send(res);
     } catch (err) {
       reply
@@ -265,7 +266,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get('/specials', async (request: FastifyRequest, reply: FastifyReply) => {
     const page = (request.query as { page: number }).page;
     try {
-      const res = await zoro.fetchSpecial(page);
+      const res = await hianime.fetchSpecial(page);
       reply.status(200).send(res);
     } catch (err) {
       reply
@@ -277,7 +278,7 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   fastify.get('/tv', async (request: FastifyRequest, reply: FastifyReply) => {
     const page = (request.query as { page: number }).page;
     try {
-      const res = await zoro.fetchTV(page);
+      const res = await hianime.fetchTV(page);
       reply.status(200).send(res);
     } catch (err) {
       reply

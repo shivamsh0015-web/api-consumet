@@ -3,7 +3,7 @@ import { BOOKS } from '@consumet/extensions';
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from 'fastify';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  const libgen = new (BOOKS as any).Libgen();
+  const libgen = (BOOKS as any).Libgen ? new (BOOKS as any).Libgen() : null;
 
   fastify.get('/', (_, rp) => {
     rp.status(200).send({
@@ -28,6 +28,12 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
       return reply.status(400).send({
         message: 'page is missing',
         error: 'invalid_input',
+      });
+    }
+    if (!libgen) {
+      return reply.status(503).send({
+        message: 'Libgen provider is not available in this version of the extensions library.',
+        error: 'service_unavailable',
       });
     }
     try {

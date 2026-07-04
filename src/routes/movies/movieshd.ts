@@ -13,7 +13,16 @@ import { redis } from "../../main";
 import { Redis } from "ioredis";
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-    const movieshd = new MOVIES.MovieHdWatch();
+    const movieshd = (MOVIES as any).MovieHdWatch ? new (MOVIES as any).MovieHdWatch() : null;
+
+  fastify.addHook('preHandler', async (request, reply) => {
+    if (!movieshd && request.url !== '/') {
+      return reply.status(503).send({
+        message: 'MovieHdWatch provider is not available in this version of the extensions library.',
+        error: 'service_unavailable',
+      });
+    }
+  });
     fastify.get("/", (_, rp) => {
         rp.status(200).send({
             intro:

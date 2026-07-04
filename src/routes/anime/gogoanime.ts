@@ -7,9 +7,18 @@ import { redis } from '../../main';
 import { Redis } from 'ioredis';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  const gogoanime = new ANIME.Gogoanime(process.env.GOGOANIME_URL);
+  const gogoanime = (ANIME as any).Gogoanime ? new (ANIME as any).Gogoanime(process.env.GOGOANIME_URL) : null;
   const redisCacheTime = 60 * 60;
   const redisPrefix = 'gogoanime:';
+
+  fastify.addHook('preHandler', async (request, reply) => {
+    if (!gogoanime && request.url !== '/') {
+      return reply.status(503).send({
+        message: 'Gogoanime provider is not available in this version of the extensions library.',
+        error: 'service_unavailable',
+      });
+    }
+  });
 
   fastify.get('/', (_, rp) => {
     rp.status(200).send({

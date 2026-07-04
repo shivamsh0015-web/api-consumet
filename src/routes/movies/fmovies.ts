@@ -8,13 +8,20 @@ import { redis } from '../../main';
 import { Redis } from 'ioredis';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  const fmovies = new MOVIES.Fmovies(
-    process.env.NINE_ANIME_HELPER_URL,
+  const fmovies = (MOVIES as any).Fmovies ? new (MOVIES as any).Fmovies(process.env.NINE_ANIME_HELPER_URL,
     {
       url: process.env.NINE_ANIME_PROXY as string,
     },
-    process.env?.NINE_ANIME_HELPER_KEY,
-  );
+    process.env?.NINE_ANIME_HELPER_KEY,) : null;
+
+  fastify.addHook('preHandler', async (request, reply) => {
+    if (!fmovies && request.url !== '/') {
+      return reply.status(503).send({
+        message: 'Fmovies provider is not available in this version of the extensions library.',
+        error: 'service_unavailable',
+      });
+    }
+  });
 
   fastify.get('/', (_, rp) => {
     rp.status(200).send({

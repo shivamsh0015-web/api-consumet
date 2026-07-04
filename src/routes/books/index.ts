@@ -4,7 +4,7 @@ import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from '
 
 import libgen from './libgen';
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  const lbgen = new (BOOKS as any).Libgen();
+  const lbgen = (BOOKS as any).Libgen ? new (BOOKS as any).Libgen() : null;
 
   fastify.get('/', async (request: any, reply: any) => {
     reply.status(200).send('Welcome to Consumet Books 📚');
@@ -20,6 +20,12 @@ const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
         message: 'bookTitle query needed',
         error: 'invalid_input',
       });
+    if (!lbgen) {
+      return reply.status(503).send({
+        message: 'Libgen provider is not available in this version of the extensions library.',
+        error: 'service_unavailable',
+      });
+    }
     try {
       const data = await lbgen.search(bookTitle, page);
       return reply.status(200).send(data);

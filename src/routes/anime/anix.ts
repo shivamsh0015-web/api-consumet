@@ -4,7 +4,16 @@ import { ANIME } from '@consumet/extensions';
 import { StreamingServers } from '@consumet/extensions/dist/models';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  const anix = new ANIME.Anix();
+  const anix = (ANIME as any).Anix ? new (ANIME as any).Anix() : null;
+
+  fastify.addHook('preHandler', async (request, reply) => {
+    if (!anix && request.url !== '/') {
+      return reply.status(503).send({
+        message: 'Anix provider is not available in this version of the extensions library.',
+        error: 'service_unavailable',
+      });
+    }
+  });
 
   fastify.get('/', (_, rp) => {
     rp.status(200).send({

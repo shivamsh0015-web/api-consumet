@@ -4,7 +4,16 @@ import { MOVIES } from '@consumet/extensions';
 import { StreamingServers } from '@consumet/extensions/dist/models';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  const multimovies = new MOVIES.MultiMovies(process.env.MULTIMOVIES_URL);
+  const multimovies = (MOVIES as any).MultiMovies ? new (MOVIES as any).MultiMovies(process.env.MULTIMOVIES_URL) : null;
+
+  fastify.addHook('preHandler', async (request, reply) => {
+    if (!multimovies && request.url !== '/') {
+      return reply.status(503).send({
+        message: 'MultiMovies provider is not available in this version of the extensions library.',
+        error: 'service_unavailable',
+      });
+    }
+  });
   let baseUrl = 'https://multimovies.life';
   if (process.env.MULTIMOVIES_URL) {
     baseUrl = `https://${process.env.MULTIMOVIES_URL}`;

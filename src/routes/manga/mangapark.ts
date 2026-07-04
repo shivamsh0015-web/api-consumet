@@ -3,7 +3,16 @@ import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from '
 import { MANGA } from '@consumet/extensions';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  const mangapark = new MANGA.Mangapark();
+  const mangapark = (MANGA as any).Mangapark ? new (MANGA as any).Mangapark() : null;
+
+  fastify.addHook('preHandler', async (request, reply) => {
+    if (!mangapark && request.url !== '/') {
+      return reply.status(503).send({
+        message: 'Mangapark provider is not available in this version of the extensions library.',
+        error: 'service_unavailable',
+      });
+    }
+  });
 
   fastify.get('/', (_, rp) => {
     rp.status(200).send({

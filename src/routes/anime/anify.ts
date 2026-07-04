@@ -3,7 +3,16 @@ import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from '
 import { ANIME } from '@consumet/extensions';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  const anify = new ANIME.Anify();
+  const anify = (ANIME as any).Anify ? new (ANIME as any).Anify() : null;
+
+  fastify.addHook('preHandler', async (request, reply) => {
+    if (!anify && request.url !== '/') {
+      return reply.status(503).send({
+        message: 'Anify provider is not available in this version of the extensions library.',
+        error: 'service_unavailable',
+      });
+    }
+  });
 
   fastify.get('/', (_, rp) => {
     rp.status(200).send({
