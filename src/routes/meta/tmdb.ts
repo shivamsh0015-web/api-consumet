@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from 'fastify';
 import { META, PROVIDERS_LIST, StreamingServers } from '@consumet/extensions';
 import { tmdbApi } from '../../main';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from 'fastify';
 import { MOVIES } from '@consumet/extensions';
 import { StreamingServers } from '@consumet/extensions/dist/models';

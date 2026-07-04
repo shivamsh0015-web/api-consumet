@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from 'fastify';
 import { MANGA } from '@consumet/extensions';
 

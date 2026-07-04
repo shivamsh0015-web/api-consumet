@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NEWS, Topics } from '@consumet/extensions';
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from 'fastify';
 

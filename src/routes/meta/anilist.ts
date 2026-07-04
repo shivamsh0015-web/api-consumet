@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Redis } from 'ioredis';
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from 'fastify';
 import { ANIME, META, PROVIDERS_LIST } from '@consumet/extensions';

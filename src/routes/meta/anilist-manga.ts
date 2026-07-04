@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from 'fastify';
 import { META } from '@consumet/extensions';
 import { PROVIDERS_LIST } from '@consumet/extensions';

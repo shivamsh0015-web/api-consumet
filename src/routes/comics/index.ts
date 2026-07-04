@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from 'fastify';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {

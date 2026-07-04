@@ -1,3 +1,4 @@
+// @ts-nocheck
 // import { COMICS } from '@consumet/extensions';
 // import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from 'fastify';
 

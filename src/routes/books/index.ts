@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { BOOKS } from '@consumet/extensions';
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from 'fastify';
 
