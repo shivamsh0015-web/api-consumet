@@ -4,6 +4,7 @@ import { ANIME } from '@consumet/extensions';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
   const animepahe = new ANIME.AnimePahe();
+  animepahe.baseUrl = process.env.ANIMEPAHE_BASE_URL || 'https://animepahe.org';
 
   fastify.get('/', (_, rp) => {
     rp.status(200).send({
