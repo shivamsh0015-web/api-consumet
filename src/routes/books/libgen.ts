@@ -2,7 +2,7 @@ import { BOOKS } from '@consumet/extensions';
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from 'fastify';
 
 const routes = async (fastify: FastifyInstance, options: RegisterOptions) => {
-  const libgen = new BOOKS.Libgen();
+  const libgen = new (BOOKS as any).Libgen();
 
   fastify.get('/', (_, rp) => {
     rp.status(200).send({
