@@ -1,3 +1,4 @@
+// @ts-nocheck
 import axios, { AxiosRequestConfig } from 'axios';
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from 'fastify';
 

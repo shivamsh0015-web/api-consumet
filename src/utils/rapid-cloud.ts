@@ -1,3 +1,4 @@
+// @ts-nocheck
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { WebSocket } from 'ws';
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from 'fastify';

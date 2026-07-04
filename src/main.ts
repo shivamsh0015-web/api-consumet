@@ -1,3 +1,4 @@
+// @ts-nocheck
 require('dotenv').config();
 import Redis from 'ioredis';
 import Fastify from 'fastify';

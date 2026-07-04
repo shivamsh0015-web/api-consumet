@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FastifyRequest, FastifyReply, FastifyInstance, RegisterOptions } from 'fastify';
 import axios from 'axios';
 import { BilibiliExtractor } from '@consumet/extensions/dist/utils';

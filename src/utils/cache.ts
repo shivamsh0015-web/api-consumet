@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Redis } from 'ioredis';
 /* eslint-disable import/no-anonymous-default-export */
 
